@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Modern responsive DGVCL / GEB electricity board portal demo." />
+  <title>DGVCL / GEB Portal | Powering South Gujarat</title>
+
+  <!-- Bootstrap 5 + Font Awesome CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+  <style>
+    /* =========================================================
+       DGVCL / GEB Portal - Internal CSS
+       Theme: Government utility, blue + white + yellow
+       ========================================================= */
+    :root {
+      --primary: #0756a5;
+      --primary-2: #003d7a;
+      --primary-soft: #eaf4ff;
+      --accent: #ffc107;
+      --accent-2: #ffe08a;
+      --success: #16a34a;
+      --danger: #dc3545;
+      --warning: #f59e0b;
+      --bg: #f5f8fc;
+      --surface: #ffffff;
+      --surface-2: #eef5ff;
+      --text: #182230;
+      --muted: #667085;
+      --border: rgba(7, 86, 165, .14);
+      --shadow: 0 18px 45px rgba(2, 32, 71, .12);
+      --shadow-sm: 0 10px 25px rgba(2, 32, 71, .09);
+      --radius: 22px;
+      --nav-height: 76px;
+    }
+
+    [data-theme="dark"] {
+      --primary: #4aa3ff;
+      --primary-2: #0b66c3;
+      --primary-soft: #102743;
+      --accent: #ffd54f;
+      --accent-2: #5e4a09;
+      --bg: #07111f;
+      --surface: #0f1d31;
+      --surface-2: #14243b;
+      --text: #eef6ff;
+      --muted: #b3c0d1;
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 45px rgba(0, 0, 0, .34);
+      --shadow-sm: 0 10px 25px rgba(0, 0, 0, .25);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      overflow-x: hidden;
+      transition: background .35s ease, color .35s ease;
+    }
+    a { text-decoration: none; }
+    section { padding: 92px 0; position: relative; }
+    .section-title { font-weight: 850; color: var(--text); letter-spacing: -.04em; }
+    .section-kicker {
+      color: var(--primary);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: .78rem;
+    }
+    .lead, .text-muted { color: var(--muted) !important; }
+    .bg-soft { background: linear-gradient(180deg, var(--surface-2), var(--bg)); }
+    .rounded-4xl { border-radius: var(--radius); }
+    .text-primary-custom { color: var(--primary) !important; }
+    .btn { border-radius: 999px; font-weight: 750; padding: .78rem 1.25rem; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: none;
+      box-shadow: 0 12px 28px rgba(7,86,165,.24);
+    }
+    .btn-warning { background: linear-gradient(135deg, var(--accent), #ffb300); border: none; color: #172033; }
+    .btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+    .btn-outline-primary:hover { background: var(--primary); border-color: var(--primary); }
+
+    /* Loading screen */
+    #loader {
+      position: fixed; inset: 0; z-index: 99999;
+      background: radial-gradient(circle at 50% 35%, #1f8cff, #063b7a 40%, #02162d 100%);
+      display: grid; place-items: center; color: #fff;
+      transition: opacity .5s ease, visibility .5s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-card { text-align: center; }
+    .power-spinner {
+      width: 78px; height: 78px; border-radius: 50%; margin: 0 auto 18px;
+      border: 6px solid rgba(255,255,255,.22); border-top-color: var(--accent);
+      animation: spin 1s linear infinite; box-shadow: 0 0 35px rgba(255,193,7,.6);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Navbar */
+    .navbar {
+      min-height: var(--nav-height);
+      background: rgba(255,255,255,.86);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 8px 30px rgba(2, 32, 71, .08);
+      transition: background .35s ease, box-shadow .35s ease;
+    }
+    [data-theme="dark"] .navbar { background: rgba(9, 22, 39, .88); }
+    .navbar-brand { color: var(--primary) !important; font-weight: 900; letter-spacing: -.03em; }
+    .brand-mark {
+      width: 42px; height: 42px; display: inline-grid; place-items: center;
+      border-radius: 14px; color: #172033; margin-right: 10px;
+      background: linear-gradient(135deg, var(--accent), #fff1b8);
+      box-shadow: 0 10px 24px rgba(255,193,7,.25);
+    }
+    .nav-link { color: var(--text) !important; font-weight: 700; position: relative; margin: 0 .15rem; }
+    .nav-link::after {
+      content: ""; position: absolute; left: .5rem; right: .5rem; bottom: .25rem;
+      height: 3px; border-radius: 10px; background: var(--accent); transform: scaleX(0); transition: .25s ease;
+    }
+    .nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
+    .navbar-toggler { border: 1px solid var(--border); }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding-top: calc(var(--nav-height) + 45px);
+      color: #fff;
+      overflow: hidden;
+      background:
+        linear-gradient(115deg, rgba(0,29,65,.94), rgba(7,86,165,.78) 50%, rgba(0,17,38,.88)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1400 900'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%230b5fac'/%3E%3Cstop offset='1' stop-color='%23001d41'/%3E%3C/linearGradient%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='4' result='b'/%3E%3CfeMerge%3E%3CfeMergeNode in='b'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Crect width='1400' height='900' fill='url(%23g)'/%3E%3Cg stroke='%23b7dcff' stroke-width='3' opacity='.42' fill='none'%3E%3Cpath d='M65 820 L245 245 L430 820 M150 555 H340 M205 380 H285'/%3E%3Cpath d='M930 820 L1110 200 L1290 820 M1012 548 H1210 M1068 365 H1155'/%3E%3Cpath d='M245 245 C480 165 720 150 1110 200'/%3E%3Cpath d='M150 555 C430 490 745 480 1210 548'/%3E%3Cpath d='M340 555 L1012 548'/%3E%3C/g%3E%3Cg filter='url(%23glow)' stroke='%23ffc107' stroke-width='5' opacity='.72'%3E%3Cpath d='M430 185 L505 120 L470 205 L550 190 L420 330 L460 235 L385 250 Z' fill='%23ffc107'/%3E%3Cpath d='M710 310 L780 240 L750 335 L830 315 L700 465 L738 365 L662 382 Z' fill='%23ffc107' opacity='.75'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: cover; background-position: center;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 42px 42px; mask-image: linear-gradient(to bottom, black, transparent 80%);
+      animation: gridMove 16s linear infinite;
+    }
+    @keyframes gridMove { to { transform: translateY(42px); } }
+    .hero h1 { font-size: clamp(2.6rem, 6vw, 5.7rem); font-weight: 950; letter-spacing: -.06em; line-height: .98; }
+    .hero .hero-sub { color: rgba(255,255,255,.82); font-size: clamp(1.05rem, 2vw, 1.35rem); max-width: 720px; }
+    .glow-text { text-shadow: 0 0 18px rgba(255,193,7,.6), 0 0 50px rgba(45,153,255,.5); }
+    .electric-orb {
+      position: absolute; width: 380px; height: 380px; right: 6%; top: 22%; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,193,7,.38), rgba(45,153,255,.18) 38%, transparent 68%);
+      filter: blur(4px); animation: pulse 2.8s ease-in-out infinite; pointer-events: none;
+    }
+    @keyframes pulse { 50% { transform: scale(1.11); opacity: .72; } }
+    .hero-metric {
+      background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(16px);
+      border-radius: 22px; padding: 18px; height: 100%;
+    }
+
+    /* Cards */
+    .glass-card, .service-card, .tip-card, .form-card, .stat-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+      box-shadow: var(--shadow-sm); transition: transform .32s ease, box-shadow .32s ease, border-color .32s ease, background .32s ease;
+    }
+    .service-card, .tip-card { padding: 28px 20px; height: 100%; cursor: pointer; position: relative; overflow: hidden; }
+    .service-card::before, .tip-card::before {
+      content: ""; position: absolute; inset: auto -40% -60% auto; width: 170px; height: 170px; border-radius: 50%;
+      background: rgba(255,193,7,.15); transition: .32s ease;
+    }
+    .service-card:hover, .tip-card:hover, .glass-card:hover { transform: translateY(-8px); box-shadow: var(--shadow); border-color: rgba(255,193,7,.45); }
+    .service-card:hover::before, .tip-card:hover::before { transform: scale(1.8); }
+    .icon-box {
+      width: 62px; height: 62px; border-radius: 20px; display: inline-grid; place-items: center;
+      color: #172033; background: linear-gradient(135deg, var(--accent), #fff2ba); font-size: 1.5rem;
+      box-shadow: 0 12px 28px rgba(255,193,7,.22); margin-bottom: 18px;
+    }
+    .stat-card { padding: 26px; text-align: center; height: 100%; }
+    .stat-number { color: var(--primary); font-weight: 950; font-size: clamp(2rem, 4vw, 3.1rem); letter-spacing: -.04em; }
+
+    /* Notification marquee */
+    .notice-strip { background: linear-gradient(90deg, var(--primary-2), var(--primary)); color: #fff; padding: 14px 0; overflow: hidden; }
+    .notice-track { display: flex; white-space: nowrap; gap: 60px; animation: marquee 24s linear infinite; }
+    .notice-track span { font-weight: 750; }
+    @keyframes marquee { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+
+    /* Forms */
+    .form-card { padding: clamp(22px, 4vw, 36px); }
+    .form-control, .form-select {
+      border-radius: 16px; padding: .84rem 1rem; border-color: var(--border); background-color: var(--surface); color: var(--text);
+    }
+    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 .25rem rgba(7,86,165,.12); background-color: var(--surface); color: var(--text); }
+    .bill-preview { display: none; background: var(--primary-soft); border: 1px dashed rgba(7,86,165,.3); border-radius: 18px; padding: 18px; }
+    .history-item { display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .history-item:last-child { border-bottom: 0; }
+
+    /* Outage table */
+    .table { color: var(--text); }
+    .table-card { overflow: hidden; }
+    .badge-status { padding: .56rem .78rem; border-radius: 999px; font-weight: 850; }
+    .status-available { background: rgba(22,163,74,.12); color: #16a34a; }
+    .status-outage { background: rgba(220,53,69,.13); color: #dc3545; }
+    .status-maintenance { background: rgba(245,158,11,.16); color: #b86d00; }
+
+    /* Contact */
+    .map-wrap { min-height: 350px; overflow: hidden; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-sm); background: var(--surface-2); }
+    .map-wrap iframe { width: 100%; height: 390px; border: 0; filter: saturate(.95); }
+
+    /* Footer */
+    footer { background: #031b36; color: rgba(255,255,255,.76); padding: 56px 0 24px; }
+    footer a { color: rgba(255,255,255,.78); display: inline-block; margin: 5px 0; }
+    footer a:hover { color: var(--accent); }
+    .social a { width: 42px; height: 42px; display: inline-grid; place-items: center; border-radius: 14px; background: rgba(255,255,255,.08); margin-right: 8px; }
+
+    /* Floating buttons */
+    .float-btn {
+      position: fixed; right: 22px; z-index: 999; width: 54px; height: 54px; border: 0; border-radius: 50%;
+      display: grid; place-items: center; color: #fff; box-shadow: var(--shadow); transition: .25s ease;
+    }
+    .float-btn:hover { transform: translateY(-4px) scale(1.04); }
+    #backToTop { bottom: 92px; background: var(--primary); opacity: 0; pointer-events: none; }
+    #backToTop.show { opacity: 1; pointer-events: all; }
+    #emergencyBtn { bottom: 158px; background: linear-gradient(135deg, #dc3545, #9d1020); animation: sos 1.8s infinite; }
+    @keyframes sos { 50% { box-shadow: 0 0 0 13px rgba(220,53,69,.14), var(--shadow); } }
+
+    /* Chatbot */
+    #chatToggle { bottom: 24px; background: linear-gradient(135deg, var(--primary), var(--primary-2)); width: 62px; height: 62px; font-size: 1.35rem; }
+    .chat-widget {
+      position: fixed; right: 22px; bottom: 96px; z-index: 1000;
+      width: min(390px, calc(100vw - 32px)); height: 570px; max-height: calc(100vh - 125px);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 26px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.25); display: none; overflow: hidden;
+    }
+    .chat-widget.open { display: flex; flex-direction: column; animation: pop .22s ease; }
+    @keyframes pop { from { transform: translateY(18px) scale(.96); opacity: 0; } }
+    .chat-head { padding: 16px; background: linear-gradient(135deg, var(--primary-2), var(--primary)); color: #fff; display: flex; align-items: center; justify-content: space-between; }
+    .chat-body { flex: 1; padding: 16px; overflow-y: auto; background: linear-gradient(180deg, var(--primary-soft), var(--surface)); }
+    .bubble { max-width: 82%; padding: 11px 14px; border-radius: 18px; margin: 9px 0; line-height: 1.35; font-size: .94rem; box-shadow: 0 8px 16px rgba(0,0,0,.06); }
+    .bubble.bot { background: var(--surface); border-top-left-radius: 6px; color: var(--text); }
+    .bubble.user { background: var(--primary); color: #fff; margin-left: auto; border-top-right-radius: 6px; }
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 16px 0; background: var(--surface); }
+    .quick-replies button { border: 1px solid var(--border); background: var(--primary-soft); color: var(--primary); border-radius: 999px; padding: 7px 10px; font-size: .8rem; font-weight: 750; }
+    .chat-input { display: flex; gap: 8px; padding: 14px; background: var(--surface); border-top: 1px solid var(--border); }
+    .typing { display: inline-flex; gap: 4px; align-items: center; }
+    .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); display: block; animation: blink 1s infinite; }
+    .typing i:nth-child(2) { animation-delay: .14s; } .typing i:nth-child(3) { animation-delay: .28s; }
+    @keyframes blink { 50% { opacity: .25; transform: translateY(-2px); } }
+
+    /* Modal/toast custom */
+    .custom-toast {
+      position: fixed; left: 50%; top: 92px; transform: translateX(-50%) translateY(-20px);
+      background: var(--surface); color: var(--text); border: 1px solid var(--border); border-left: 6px solid var(--accent);
+      border-radius: 18px; box-shadow: var(--shadow); padding: 16px 18px; z-index: 2000; width: min(560px, calc(100vw - 28px));
+      opacity: 0; pointer-events: none; transition: .28s ease;
+    }
+    .custom-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: all; }
+
+    /* Animations */
+    .reveal { opacity: 0; transform: translateY(28px); transition: .75s cubic-bezier(.2,.8,.2,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    canvas { width: 100%; max-width: 100%; background: var(--surface); border-radius: 18px; }
+
+    @media (max-width: 991.98px) {
+      .navbar-collapse { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; margin-top: 10px; padding: 12px; box-shadow: var(--shadow-sm); }
+      .hero { text-align: center; }
+      .hero .hero-sub { margin-left: auto; margin-right: auto; }
+      .electric-orb { right: -120px; top: 120px; }
+      section { padding: 72px 0; }
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #receiptArea, #receiptArea * { visibility: visible; }
+      #receiptArea { position: absolute; left: 0; top: 0; width: 100%; background: #fff; color: #111; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loader" aria-label="Loading website">
+    <div class="loader-card">
+      <div class="power-spinner"></div>
+      <h4 class="fw-bold mb-1">DGVCL / GEB Portal</h4>
+      <p class="mb-0 text-white-50">Connecting secure electricity services...</p>
+    </div>
+  </div>
+
+  <!-- Notification popup -->
+  <div id="siteToast" class="custom-toast" role="alert">
+    <div class="d-flex gap-3 align-items-start">
+      <div class="icon-box m-0" style="width:44px;height:44px;border-radius:14px;font-size:1rem"><i class="fa-solid fa-cloud-bolt"></i></div>
+      <div class="flex-grow-1">
+        <strong id="toastTitle">Important Alert</strong>
+        <div id="toastMsg" class="small text-muted mt-1">Bad weather may cause outages in some areas.</div>
+      </div>
+      <button class="btn-close" aria-label="Close" onclick="hideToast()"></button>
+    </div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-xl fixed-top">
+    <div class="container-fluid px-lg-5">
+      <a class="navbar-brand d-flex align-items-center" href="#home" aria-label="DGVCL home">
+        <span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>
+        <span>DGVCL / GEB Portal</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-1">
+          <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+          <li class="nav-item"><a class="nav-link" href="#bill-payment">Bill Payment</a></li>
+          <li class="nav-item"><a class="nav-link" href="#outage">Outage Status</a></li>
+          <li class="nav-item"><a class="nav-link" href="#complaints">Complaints</a></li>
+          <li class="nav-item"><a class="nav-link" href="#tips">Energy Tips</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        </ul>
+        <div class="d-flex align-items-center gap-2 ms-xl-3 mt-3 mt-xl-0">
+          <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#loginModal"><i class="fa-solid fa-user-lock me-1"></i> Login</button>
+          <button id="themeToggle" class="btn btn-warning btn-sm" type="button" aria-label="Toggle dark mode"><i class="fa-solid fa-moon"></i></button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="home" class="hero">
+    <div class="electric-orb"></div>
+    <div class="container position-relative">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-8 reveal">
+          <span class="badge rounded-pill bg-warning text-dark px-3 py-2 mb-4"><i class="fa-solid fa-shield-halved me-2"></i>Reliable Government Utility Services</span>
+          <h1 class="glow-text mb-4">Powering South Gujarat, Empowering Lives</h1>
+          <p class="hero-sub mb-4">Reliable electricity services for homes, businesses, and industries with fast digital payments, outage alerts, and smart complaint tracking.</p>
+          <div class="d-flex flex-wrap gap-3 justify-content-lg-start justify-content-center">
+            <a class="btn btn-warning btn-lg" href="#bill-payment"><i class="fa-solid fa-credit-card me-2"></i>Pay Bill</a>
+            <a class="btn btn-light btn-lg" href="#complaints"><i class="fa-solid fa-headset me-2 text-primary-custom"></i>Register Complaint</a>
+            <a class="btn btn-outline-light btn-lg" href="#outage"><i class="fa-solid fa-tower-broadcast me-2"></i>Check Outage</a>
+          </div>
+        </div>
+        <div class="col-lg-4 reveal">
+          <div class="row g-3">
+            <div class="col-6"><div class="hero-metric"><h3 class="fw-black mb-0">24x7</h3><small>Emergency support</small></div></div>
+            <div class="col-6"><div class="hero-metric"><h3 class="fw-black mb-0">99.2%</h3><small>Network uptime</small></div></div>
+            <div class="col-12"><div class="hero-metric"><div class="d-flex align-items-center gap-3"><i class="fa-solid fa-bolt-lightning fa-2x text-warning"></i><div><h5 class="mb-1 fw-bold">Smart digital portal</h5><small>Payments, receipts, outage search and chatbot assistance.</small></div></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notifications marquee -->
+  <div id="notifications" class="notice-strip">
+    <div class="notice-track">
+      <span><i class="fa-solid fa-screwdriver-wrench me-2 text-warning"></i>Scheduled maintenance in selected Surat feeders from 10:00 AM to 1:00 PM.</span>
+      <span><i class="fa-solid fa-solar-panel me-2 text-warning"></i>New solar rooftop subsidy awareness drive launched.</span>
+      <span><i class="fa-solid fa-triangle-exclamation me-2 text-warning"></i>Emergency alerts: keep away from fallen wires during rain.</span>
+      <span><i class="fa-solid fa-file-invoice-dollar me-2 text-warning"></i>Tariff updates available under consumer information section.</span>
+    </div>
+  </div>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 reveal">
+          <p class="section-kicker">About DGVCL</p>
+          <h2 class="section-title display-5 mb-3">A modern electricity distribution experience for South Gujarat.</h2>
+          <p class="lead">Dakshin Gujarat Vij Company Limited provides electricity distribution services across South Gujarat with a focus on reliability, safety, consumer service, and clean energy adoption.</p>
+          <div class="glass-card p-4 mt-4">
+            <div class="row g-4">
+              <div class="col-sm-6"><h5><i class="fa-solid fa-bullseye text-primary-custom me-2"></i>Mission</h5><p class="text-muted small mb-0">Deliver safe, affordable and uninterrupted power with transparent digital services.</p></div>
+              <div class="col-sm-6"><h5><i class="fa-solid fa-eye text-primary-custom me-2"></i>Vision</h5><p class="text-muted small mb-0">Become a consumer-first, technology-enabled and sustainable power utility.</p></div>
+              <div class="col-12"><h5><i class="fa-solid fa-map-location-dot text-primary-custom me-2"></i>Service Areas</h5><p class="text-muted small mb-0">Surat, Navsari, Valsad, Bharuch, Narmada, Tapi, Dang and nearby South Gujarat regions.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 reveal">
+          <div class="row g-3">
+            <div class="col-sm-6"><div class="stat-card"><div class="stat-number counter" data-target="38" data-suffix="L+">0</div><p class="fw-bold mb-0">Consumers Served</p></div></div>
+            <div class="col-sm-6"><div class="stat-card"><div class="stat-number counter" data-target="120" data-suffix="+">0</div><p class="fw-bold mb-0">Cities Covered</p></div></div>
+            <div class="col-sm-6"><div class="stat-card"><div class="stat-number counter" data-target="75" data-suffix="MU">0</div><p class="fw-bold mb-0">Daily Units Supplied</p></div></div>
+            <div class="col-sm-6"><div class="stat-card"><div class="stat-number counter" data-target="96" data-suffix="%">0</div><p class="fw-bold mb-0">Complaint Resolution Rate</p></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Services -->
+  <section id="services" class="bg-soft">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <p class="section-kicker">Quick Services</p>
+        <h2 class="section-title display-5">Everything you need, one click away.</h2>
+      </div>
+      <div class="row g-4" id="serviceGrid"></div>
+    </div>
+  </section>
+
+  <!-- Bill Payment -->
+  <section id="bill-payment">
+    <div class="container">
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-7 reveal">
+          <p class="section-kicker">Secure Payment</p>
+          <h2 class="section-title display-5 mb-4">Bill Payment Portal</h2>
+          <div class="form-card">
+            <form id="billForm" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Consumer Number</label>
+                  <input id="consumerNo" class="form-control" placeholder="Example: 12345678901" maxlength="11" required>
+                  <div class="invalid-feedback">Consumer number must be 11 digits.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Mobile Number</label>
+                  <input id="billMobile" class="form-control" placeholder="10 digit mobile" maxlength="10" required>
+                  <div class="invalid-feedback">Enter a valid 10 digit mobile number.</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-bold">Bill Amount (₹)</label>
+                  <input id="billAmount" type="number" class="form-control" placeholder="Amount will auto-fill after fetch" min="1" required>
+                </div>
+              </div>
+              <div id="billPreview" class="bill-preview mt-4"></div>
+              <div class="d-flex flex-wrap gap-3 mt-4">
+                <button type="button" id="fetchBillBtn" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass me-2"></i>Fetch Bill</button>
+                <button type="submit" class="btn btn-warning"><i class="fa-solid fa-lock me-2"></i>Pay Now</button>
+                <button type="button" id="downloadReceiptBtn" class="btn btn-outline-primary" disabled><i class="fa-solid fa-download me-2"></i>Download Receipt</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-lg-5 reveal">
+          <div class="glass-card p-4 mb-4">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-clock-rotate-left text-primary-custom me-2"></i>Bill History</h4>
+            <div id="billHistory"></div>
+          </div>
+          <div class="glass-card p-4">
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-chart-column text-primary-custom me-2"></i>Electricity Usage Graph</h4>
+            <canvas id="usageChart" height="240" aria-label="Monthly electricity usage chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outage Status -->
+  <section id="outage" class="bg-soft">
+    <div class="container">
+      <div class="row align-items-end mb-4 g-3 reveal">
+        <div class="col-lg-7">
+          <p class="section-kicker">Live Grid Information</p>
+          <h2 class="section-title display-5 mb-0">Outage Status</h2>
+        </div>
+        <div class="col-lg-5">
+          <input id="outageSearch" class="form-control" placeholder="Search by area or status...">
+        </div>
+      </div>
+      <div class="glass-card table-card reveal">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-primary"><tr><th>Area</th><th>Status</th><th>Estimated Restore Time</th></tr></thead>
+            <tbody id="outageTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Complaint Registration -->
+  <section id="complaints">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-9 reveal">
+          <div class="text-center mb-4">
+            <p class="section-kicker">Consumer Support</p>
+            <h2 class="section-title display-5">Complaint Registration</h2>
+          </div>
+          <div class="form-card">
+            <form id="complaintForm" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6"><label class="form-label fw-bold">Name</label><input id="compName" class="form-control" required></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Consumer Number</label><input id="compConsumer" class="form-control" maxlength="11" required></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Mobile</label><input id="compMobile" class="form-control" maxlength="10" required></div>
+                <div class="col-md-6"><label class="form-label fw-bold">Complaint Type</label><select id="compType" class="form-select" required><option value="">Select complaint type</option><option>No Power</option><option>Low Voltage</option><option>Meter Issue</option><option>Billing Issue</option><option>Transformer Problem</option></select></div>
+                <div class="col-12"><label class="form-label fw-bold">Description</label><textarea id="compDesc" class="form-control" rows="4" placeholder="Describe the issue with location details" required></textarea></div>
+              </div>
+              <button class="btn btn-primary mt-4" type="submit"><i class="fa-solid fa-paper-plane me-2"></i>Submit Complaint</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Energy Tips -->
+  <section id="tips" class="bg-soft">
+    <div class="container">
+      <div class="text-center mb-5 reveal">
+        <p class="section-kicker">Save Energy</p>
+        <h2 class="section-title display-5">Energy Saving Tips</h2>
+      </div>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3 reveal"><div class="tip-card"><div class="icon-box"><i class="fa-solid fa-lightbulb"></i></div><h5 class="fw-bold">Use LED bulbs</h5><p class="text-muted mb-0">LED lighting consumes less power and lasts longer than traditional bulbs.</p></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="tip-card"><div class="icon-box"><i class="fa-solid fa-power-off"></i></div><h5 class="fw-bold">Turn off unused appliances</h5><p class="text-muted mb-0">Switch off fans, ACs and chargers when not in use to reduce wastage.</p></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="tip-card"><div class="icon-box"><i class="fa-solid fa-star"></i></div><h5 class="fw-bold">Use star-rated devices</h5><p class="text-muted mb-0">Choose high-efficiency appliances with better star ratings.</p></div></div>
+        <div class="col-md-6 col-lg-3 reveal"><div class="tip-card"><div class="icon-box"><i class="fa-solid fa-gauge-high"></i></div><h5 class="fw-bold">Reduce peak-hour usage</h5><p class="text-muted mb-0">Shift non-essential consumption away from peak load hours.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-5 reveal">
+          <p class="section-kicker">Reach Us</p>
+          <h2 class="section-title display-5 mb-4">Contact DGVCL</h2>
+          <div class="glass-card p-4 h-100">
+            <p><i class="fa-solid fa-location-dot text-primary-custom me-2"></i><strong>Office Address:</strong><br>DGVCL Corporate Office, Nana Varachha Road, Surat, Gujarat, India</p>
+            <p><i class="fa-solid fa-phone text-primary-custom me-2"></i><strong>Customer Care:</strong> 1800-233-3003</p>
+            <p><i class="fa-solid fa-triangle-exclamation text-danger me-2"></i><strong>Emergency Helpline:</strong> 19123</p>
+            <p><i class="fa-solid fa-envelope text-primary-custom me-2"></i><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1774626463787a72657476657257737061747b39726f767a677b72">[email&#160;protected]</a></p>
+            <div class="alert alert-warning rounded-4 mt-4"><i class="fa-solid fa-cloud-showers-heavy me-2"></i><span id="weatherAlert">Bad weather may cause outages in some areas.</span></div>
+          </div>
+        </div>
+        <div class="col-lg-7 reveal">
+          <div class="map-wrap h-100">
+            <iframe title="DGVCL Surat map" loading="lazy" allowfullscreen src="https://www.google.com/maps?q=DGVCL%20Surat%20Gujarat&output=embed"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <h4 class="fw-bold text-white"><span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>DGVCL / GEB Portal</h4>
+          <p class="mt-3">Premium demo portal for South Gujarat electricity consumers, built with Bootstrap 5, JavaScript, responsive UI and smart assistant features.</p>
+        </div>
+        <div class="col-md-4 col-lg-2"><h5 class="text-white fw-bold">Quick Links</h5><a href="#about">About</a><br><a href="#services">Services</a><br><a href="#bill-payment">Pay Bill</a><br><a href="#outage">Outage</a></div>
+        <div class="col-md-4 col-lg-3"><h5 class="text-white fw-bold">Policies</h5><a href="#">Privacy Policy</a><br><a href="#">Terms of Use</a><br><a href="#">Safety Guidelines</a><br><a href="#">Tariff Updates</a></div>
+        <div class="col-md-4 col-lg-3"><h5 class="text-white fw-bold">Social</h5><div class="social"><a href="#"><i class="fa-brands fa-facebook-f"></i></a><a href="#"><i class="fa-brands fa-x-twitter"></i></a><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-youtube"></i></a></div></div>
+      </div>
+      <hr class="border-light opacity-25 my-4">
+      <div class="d-flex flex-wrap justify-content-between gap-2"><small>© <span id="year"></span> DGVCL / GEB Portal. All rights reserved.</small><small>Designed as a responsive public utility portal demo.</small></div>
+    </div>
+  </footer>
+
+  <!-- Receipt printable area -->
+  <div id="receiptArea" class="container py-5" style="display:none"></div>
+
+  <!-- Floating controls -->
+  <button id="emergencyBtn" class="float-btn" title="Emergency Helpline" onclick="showToast('Emergency Helpline', 'Call DGVCL emergency support at 19123 for dangerous faults or fallen wires.')"><i class="fa-solid fa-phone-volume"></i></button>
+  <button id="backToTop" class="float-btn" title="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+  <button id="chatToggle" class="float-btn" title="DGVCL Smart Assistant"><i class="fa-solid fa-comments"></i></button>
+
+  <!-- Chatbot -->
+  <div id="chatWidget" class="chat-widget" aria-live="polite">
+    <div class="chat-head">
+      <div><strong><i class="fa-solid fa-robot me-2"></i>DGVCL Smart Assistant</strong><br><small class="text-white-50">Online FAQ support</small></div>
+      <button id="chatMinimize" class="btn btn-sm btn-light" aria-label="Minimize chat"><i class="fa-solid fa-minus"></i></button>
+    </div>
+    <div id="chatBody" class="chat-body"></div>
+    <div class="quick-replies" id="quickReplies"></div>
+    <div class="chat-input">
+      <button id="voiceBtn" class="btn btn-outline-primary px-3" title="Voice input"><i class="fa-solid fa-microphone"></i></button>
+      <input id="chatInput" class="form-control" placeholder="Ask about bill, complaint, helpline...">
+      <button id="sendChat" class="btn btn-primary px-3"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-0"><h5 class="modal-title fw-bold">Consumer Login</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body pt-0">
+          <input class="form-control mb-3" placeholder="Consumer number / username">
+          <input class="form-control mb-3" type="password" placeholder="Password">
+          <button class="btn btn-primary w-100" data-bs-dismiss="modal" onclick="showToast('Login Demo', 'This is a frontend demo login interface.')">Login Securely</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    /* =========================================================
+       DGVCL / GEB Portal - Internal JavaScript
+       Contains validation, chatbot, theme, chart, receipt, counters
+       ========================================================= */
+    const $ = (sel, root = document) => root.querySelector(sel);
+    const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+    const rupee = n => '₹' + Number(n).toLocaleString('en-IN');
+    let lastReceipt = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      initLoader(); initTheme(); initReveal(); initCounters(); initServices(); initBillPortal(); initBillHistory(); initUsageChart(); initOutages(); initComplaintForm(); initChatbot(); initScrollButtons(); initActiveNav(); initWeatherAlert();
+      $('#year').textContent = new Date().getFullYear();
+    });
+
+    function initLoader() {
+      window.addEventListener('load', () => setTimeout(() => $('#loader').classList.add('hidden'), 650));
+    }
+
+    function showToast(title, message) {
+      $('#toastTitle').textContent = title;
+      $('#toastMsg').textContent = message;
+      $('#siteToast').classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(hideToast, 6500);
+    }
+    function hideToast() { $('#siteToast').classList.remove('show'); }
+
+    function initWeatherAlert() {
+      const dummyWeather = { condition: 'rain', windKmph: 31 };
+      if (['storm', 'rain'].includes(dummyWeather.condition) || dummyWeather.windKmph > 30) {
+        const msg = 'Bad weather may cause outages in some areas. Please avoid touching electric poles, transformers and fallen wires.';
+        $('#weatherAlert').textContent = msg;
+        setTimeout(() => showToast('Weather-based Alert', msg), 1200);
+      }
+    }
+
+    function initTheme() {
+      const saved = localStorage.getItem('dgvcl-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+      updateThemeIcon(saved);
+      $('#themeToggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('dgvcl-theme', next);
+        updateThemeIcon(next);
+        drawUsageChart();
+      });
+    }
+    function updateThemeIcon(theme) { $('#themeToggle').innerHTML = theme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>'; }
+
+    function initReveal() {
+      const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }), { threshold: .12 });
+      $$('.reveal').forEach(el => io.observe(el));
+    }
+
+    function initCounters() {
+      const counters = $$('.counter');
+      const io = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (!entry.isIntersecting || entry.target.dataset.done) return;
+        entry.target.dataset.done = true;
+        const target = Number(entry.target.dataset.target), suffix = entry.target.dataset.suffix || '';
+        let start = 0, duration = 1450, t0 = performance.now();
+        const tick = now => {
+          const p = Math.min((now - t0) / duration, 1);
+          const value = Math.floor(target * (1 - Math.pow(1 - p, 3)));
+          entry.target.textContent = value + suffix;
+          if (p < 1) requestAnimationFrame(tick); else entry.target.textContent = target + suffix;
+        };
+        requestAnimationFrame(tick);
+      }), { threshold: .45 });
+      counters.forEach(c => io.observe(c));
+    }
+
+    function initServices() {
+      const services = [
+        ['Bill Payment','fa-credit-card','Pay your electricity bill securely online','#bill-payment'],
+        ['Download Bill','fa-file-arrow-down','View and download monthly bill copies','#bill-payment'],
+        ['New Connection','fa-plug-circle-plus','Apply for home, shop or industrial connection','#contact'],
+        ['Complaint Registration','fa-headset','Register and track consumer complaints','#complaints'],
+        ['Meter Reading','fa-gauge','Submit or view meter reading details','#services'],
+        ['Outage Report','fa-tower-broadcast','Check local outage and restoration updates','#outage'],
+        ['Solar Rooftop','fa-solar-panel','Explore clean energy rooftop schemes','#tips'],
+        ['Energy Calculator','fa-calculator','Estimate monthly electricity usage','#bill-payment']
+      ];
+      $('#serviceGrid').innerHTML = services.map((s, i) => `
+        <div class="col-sm-6 col-lg-3 reveal" style="transition-delay:${i * 40}ms">
+          <a href="${s[3]}" class="service-card d-block text-reset">
+            <div class="icon-box"><i class="fa-solid ${s[1]}"></i></div>
+            <h5 class="fw-bold">${s[0]}</h5><p class="text-muted small mb-0">${s[2]}</p>
+          </a>
+        </div>`).join('');
+      initReveal();
+    }
+
+    function validConsumer(v) { return /^\d{11}$/.test(v.trim()); }
+    function validMobile(v) { return /^\d{10}$/.test(v.trim()); }
+
+    function initBillPortal() {
+      $('#fetchBillBtn').addEventListener('click', fetchBill);
+      $('#billForm').addEventListener('submit', payBill);
+      $('#downloadReceiptBtn').addEventListener('click', printReceipt);
+      ['consumerNo','billMobile','billAmount'].forEach(id => $('#' + id).addEventListener('input', e => e.target.classList.remove('is-invalid')));
+    }
+
+    function fetchBill() {
+      const c = $('#consumerNo'), m = $('#billMobile');
+      let ok = true;
+      if (!validConsumer(c.value)) { c.classList.add('is-invalid'); ok = false; }
+      if (!validMobile(m.value)) { m.classList.add('is-invalid'); ok = false; }
+      if (!ok) return showToast('Validation Required', 'Please enter a valid 11 digit consumer number and 10 digit mobile number.');
+      const seed = Number(c.value.slice(-4));
+      const amount = 650 + (seed % 2400);
+      const dueDate = new Date(Date.now() + 7 * 86400000).toLocaleDateString('en-IN');
+      $('#billAmount').value = amount;
+      $('#billPreview').style.display = 'block';
+      $('#billPreview').innerHTML = `<div class="row g-3"><div class="col-sm-6"><strong>Consumer:</strong> ${c.value}</div><div class="col-sm-6"><strong>Billing Month:</strong> ${new Date().toLocaleString('en-IN', { month:'long', year:'numeric' })}</div><div class="col-sm-6"><strong>Units:</strong> ${180 + (seed % 220)} kWh</div><div class="col-sm-6"><strong>Due Date:</strong> ${dueDate}</div><div class="col-12"><h4 class="mb-0 text-primary-custom">Payable Amount: ${rupee(amount)}</h4></div></div>`;
+      showToast('Bill Fetched', 'Sample bill data generated successfully. You can proceed to payment.');
+    }
+
+    function payBill(e) {
+      e.preventDefault();
+      const c = $('#consumerNo'), m = $('#billMobile'), a = $('#billAmount');
+      let ok = true;
+      if (!validConsumer(c.value)) { c.classList.add('is-invalid'); ok = false; }
+      if (!validMobile(m.value)) { m.classList.add('is-invalid'); ok = false; }
+      if (!a.value || Number(a.value) <= 0) { a.classList.add('is-invalid'); ok = false; }
+      if (!ok) return showToast('Payment Failed', 'Please verify all payment details before continuing.');
+      const receiptNo = 'DGVCL-RCPT-' + Date.now().toString().slice(-8);
+      lastReceipt = { receiptNo, consumer: c.value, mobile: m.value, amount: Number(a.value), date: new Date().toLocaleString('en-IN') };
+      createReceipt(lastReceipt);
+      $('#downloadReceiptBtn').disabled = false;
+      showToast('Payment Successful', `Payment of ${rupee(a.value)} completed. Receipt No: ${receiptNo}`);
+    }
+
+    function createReceipt(data) {
+      $('#receiptArea').style.display = 'block';
+      $('#receiptArea').innerHTML = `<div class="p-4 border rounded-4"><h2>DGVCL / GEB Payment Receipt</h2><hr><p><strong>Receipt No:</strong> ${data.receiptNo}</p><p><strong>Consumer Number:</strong> ${data.consumer}</p><p><strong>Mobile:</strong> ${data.mobile}</p><p><strong>Amount Paid:</strong> ${rupee(data.amount)}</p><p><strong>Date:</strong> ${data.date}</p><p><strong>Status:</strong> Paid Successfully</p><hr><small>This is a computer generated demo receipt.</small></div>`;
+    }
+    function printReceipt() {
+      if (!lastReceipt) return showToast('No Receipt', 'Please complete a bill payment first.');
+      window.print();
+    }
+
+    function initBillHistory() {
+      const bills = [
+        ['May 2026', 1284, 'Paid'], ['Apr 2026', 1196, 'Paid'], ['Mar 2026', 1428, 'Paid'], ['Feb 2026', 1087, 'Paid']
+      ];
+      $('#billHistory').innerHTML = bills.map(b => `<div class="history-item"><span><strong>${b[0]}</strong><br><small class="text-muted">Residential LT supply</small></span><span class="text-end"><strong>${rupee(b[1])}</strong><br><small class="text-success">${b[2]}</small></span></div>`).join('');
+    }
+
+    function initUsageChart() { drawUsageChart(); window.addEventListener('resize', drawUsageChart); }
+    function drawUsageChart() {
+      const canvas = $('#usageChart'), ctx = canvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect(); canvas.width = rect.width * dpr; canvas.height = 240 * dpr; ctx.scale(dpr, dpr);
+      const w = rect.width, h = 240, pad = 34; ctx.clearRect(0,0,w,h);
+      const data = [220, 245, 210, 275, 310, 360, 335, 298, 260, 240, 228, 250];
+      const months = ['Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May','Jun'];
+      const max = 400, barW = (w - pad * 2) / data.length * .62;
+      const styles = getComputedStyle(document.documentElement); const primary = styles.getPropertyValue('--primary').trim(); const accent = styles.getPropertyValue('--accent').trim(); const muted = styles.getPropertyValue('--muted').trim();
+      ctx.font = '12px system-ui'; ctx.fillStyle = muted; ctx.strokeStyle = 'rgba(120,140,170,.25)';
+      for (let i=0;i<4;i++) { const y = pad + i*(h-pad*2)/3; ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad,y); ctx.stroke(); }
+      data.forEach((v,i) => {
+        const x = pad + i*((w-pad*2)/data.length) + 8; const bh = (v/max)*(h-pad*2); const y = h-pad-bh;
+        const grad = ctx.createLinearGradient(0,y,0,h-pad); grad.addColorStop(0, accent); grad.addColorStop(1, primary);
+        ctx.fillStyle = grad; roundRect(ctx, x, y, barW, bh, 9); ctx.fill();
+        ctx.fillStyle = muted; ctx.fillText(months[i], x-1, h-12);
+      });
+    }
+    function roundRect(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+    function initOutages() {
+      const outages = [
+        ['Surat - Adajan','Power Available','--','available'], ['Navsari Grid','Maintenance','Today 03:30 PM','maintenance'], ['Valsad - GIDC','Outage','Today 05:15 PM','outage'], ['Bharuch City','Power Available','--','available'], ['Ankleshwar Industrial','Maintenance','Today 04:00 PM','maintenance'], ['Vapi East','Outage','Today 06:00 PM','outage'], ['Bardoli','Power Available','--','available'], ['Vyara','Power Available','--','available']
+      ];
+      const render = rows => $('#outageTable').innerHTML = rows.map(r => `<tr><td><strong>${r[0]}</strong></td><td><span class="badge-status status-${r[3]}">${r[1]}</span></td><td>${r[2]}</td></tr>`).join('');
+      render(outages);
+      $('#outageSearch').addEventListener('input', e => { const q = e.target.value.toLowerCase(); render(outages.filter(r => r.join(' ').toLowerCase().includes(q))); });
+    }
+
+    function initComplaintForm() {
+      $('#complaintForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const name = $('#compName'), consumer = $('#compConsumer'), mobile = $('#compMobile'), type = $('#compType'), desc = $('#compDesc');
+        if (!name.value.trim() || !validConsumer(consumer.value) || !validMobile(mobile.value) || !type.value || desc.value.trim().length < 8) {
+          return showToast('Complaint Validation', 'Please fill all complaint details. Consumer number must be 11 digits and mobile must be 10 digits.');
+        }
+        const ticket = 'DGVCL-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+        showToast('Complaint Registered', `Your ${type.value} complaint has been registered. Ticket Number: ${ticket}`);
+        e.target.reset();
+      });
+    }
+
+    function initScrollButtons() {
+      const btn = $('#backToTop');
+      window.addEventListener('scroll', () => btn.classList.toggle('show', window.scrollY > 500));
+      btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
+    function initActiveNav() {
+      const sections = $$('header[id], section[id]');
+      const links = $$('.nav-link');
+      window.addEventListener('scroll', () => {
+        let current = 'home';
+        sections.forEach(s => { if (window.scrollY >= s.offsetTop - 130) current = s.id; });
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + current));
+      });
+      links.forEach(l => l.addEventListener('click', () => { const nav = bootstrap.Collapse.getInstance($('#mainNav')); if (nav) nav.hide(); }));
+    }
+
+    function initChatbot() {
+      const chat = $('#chatWidget'), body = $('#chatBody'), input = $('#chatInput');
+      const suggestions = ['How to pay bill?', 'How to register complaint?', 'What is helpline number?', 'Current outage status?', 'Office timing?'];
+      $('#quickReplies').innerHTML = suggestions.map(s => `<button type="button">${s}</button>`).join('');
+      $('#chatToggle').addEventListener('click', () => { chat.classList.toggle('open'); if (chat.classList.contains('open') && !body.dataset.ready) { addBot('Hello! I am DGVCL Assistant. How can I help you today?'); body.dataset.ready = '1'; } });
+      $('#chatMinimize').addEventListener('click', () => chat.classList.remove('open'));
+      $('#sendChat').addEventListener('click', sendChat);
+      input.addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+      $$('#quickReplies button').forEach(b => b.addEventListener('click', () => { input.value = b.textContent; sendChat(); }));
+      $('#voiceBtn').addEventListener('click', voiceInput);
+    }
+    function addBubble(text, who) { const div = document.createElement('div'); div.className = 'bubble ' + who; div.innerHTML = text; $('#chatBody').appendChild(div); $('#chatBody').scrollTop = $('#chatBody').scrollHeight; return div; }
+    function addBot(text) { addBubble(text, 'bot'); }
+    function sendChat() {
+      const input = $('#chatInput'), q = input.value.trim(); if (!q) return;
+      addBubble(q, 'user'); input.value = '';
+      const typing = addBubble('<span class="typing"><i></i><i></i><i></i></span>', 'bot');
+      setTimeout(() => { typing.remove(); addBot(getBotAnswer(q)); }, 700);
+    }
+    function getBotAnswer(q) {
+      const s = q.toLowerCase();
+      if (/(pay|payment|bill|online)/.test(s)) return 'To pay your bill, open <strong>Bill Payment</strong>, enter your 11 digit consumer number, mobile number, fetch bill details, then click <strong>Pay Now</strong>.';
+      if (/(complaint|register|problem|issue|no power|low voltage)/.test(s)) return 'Go to <strong>Complaints</strong>, fill your name, consumer number, mobile, complaint type and description. A ticket number will be generated automatically.';
+      if (/(helpline|phone|contact|emergency|number|support)/.test(s)) return 'Customer Care: <strong>1800-233-3003</strong>. Emergency helpline for dangerous electrical faults: <strong>19123</strong>.';
+      if (/(new connection|apply|connection|meter)/.test(s)) return 'For a new connection, select the <strong>New Connection</strong> service card and submit required identity, address, ownership and load documents at the nearest office or online portal.';
+      if (/(outage|status|power cut|restore|maintenance)/.test(s)) return 'Please check the <strong>Outage Status</strong> section. You can search your area and view available, outage or maintenance status with estimated restore time.';
+      if (/(office|timing|hours|time)/.test(s)) return 'Typical office timing is <strong>10:30 AM to 6:10 PM, Monday to Saturday</strong>, except public holidays. Emergency services operate 24x7.';
+      if (/(solar|rooftop|subsidy)/.test(s)) return 'Solar rooftop information is available under Quick Services and Energy Tips. DGVCL encourages eligible consumers to adopt grid-connected rooftop solar systems.';
+      return 'Sorry, I couldn’t understand. Please contact support at <strong>19123</strong>.';
+    }
+    function voiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return showToast('Voice Input Unavailable', 'Your browser does not support Web Speech API speech-to-text.');
+      const rec = new SpeechRecognition(); rec.lang = 'en-IN'; rec.interimResults = false;
+      $('#voiceBtn').innerHTML = '<i class="fa-solid fa-wave-square"></i>';
+      rec.onresult = e => { $('#chatInput').value = e.results[0][0].transcript; sendChat(); };
+      rec.onerror = () => showToast('Voice Input Error', 'Could not capture voice. Please try again or type your query.');
+      rec.onend = () => $('#voiceBtn').innerHTML = '<i class="fa-solid fa-microphone"></i>';
+      rec.start();
+    }
+  </script>
+</body>
+</html>
